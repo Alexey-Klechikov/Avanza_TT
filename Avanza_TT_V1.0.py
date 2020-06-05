@@ -9,6 +9,8 @@ Requirements for a nice interface:
 * PyQt<=5.12.2
 '''
 
+# import pkg_resources.py2_warn ## This is somehow required if I am "pyinstalling" in windows 10
+
 from PyQt5 import QtCore, QtGui, QtWidgets, QtTest
 import avanza, os, platform, sys, pkgutil, datetime, threading, h5py
 import pyqtgraph as pg
@@ -588,7 +590,7 @@ class GUI(Ui_MainWindow):
         if not self.Interface_CheckBox_Show_Warnings.isChecked(): return
 
         toaster = ToastNotifier()
-        toaster.show_toast(category, message, duration=10, threaded=True)
+        toaster.show_toast(category, message, duration=10, icon_path=self.iconpath, threaded=True)
 
 if __name__ == "__main__":
     QtWidgets.QApplication.setStyle("Fusion")
