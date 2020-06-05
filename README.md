@@ -1,2 +1,2 @@
 # Avanza_TT
-Ticker tracker for Avanza (unoficcial)
+Ticker tracker for Avanza (unofficial)
