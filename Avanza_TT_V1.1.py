@@ -70,7 +70,7 @@ class Ticker:
 
 ''' __For TimeAxis plotting__ '''
 class TimeAxisItem(pg.AxisItem):
-    def tickStrings(self, values, scale, spacing):
+    def f_tickStrings(self, values, scale, spacing):
         return [datetime.fromtimestamp(value).date() for value in values]
 
 ''' Interface / Main Window '''
@@ -143,12 +143,12 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         MainWindow.setCentralWidget(self.centralwidget)
 
         # Block: Table
-        self.Interface_Table_Main = QtWidgets.QTableWidget(self.centralwidget)
-        self.__create_element(self.Interface_Table_Main, [5, 5, 815, 581], "Interface_Table_Main", font=font_ee)
-        self.Interface_Table_Main.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.Interface_Table_Main.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
-        self.Interface_Table_Main.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
-        self.Interface_Table_Main.verticalHeader().hide()
+        self.Interface_TableMain = QtWidgets.QTableWidget(self.centralwidget)
+        self.__create_element(self.Interface_TableMain, [5, 5, 815, 581], "Interface_TableMain", font=font_ee)
+        self.Interface_TableMain.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.Interface_TableMain.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.Interface_TableMain.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOff)
+        self.Interface_TableMain.verticalHeader().hide()
 
         # Block: Tickers management
         self.Interface_Label_TickersManagement = QtWidgets.QLabel(self.centralwidget)
@@ -245,14 +245,14 @@ class Ui_MainWindow(QtWidgets.QMainWindow):
         self.__create_element(self.Interface_LineEdit_Proxy, [60, 23, 190, 22], "Interface_LineEdit_Proxy", font=font_ee, placeholder="X.X.X.X:xxxx or proxy.com:xxxx", alignment=QtCore.Qt.AlignCenter)
 
         # Layout management (Stretching of the table with the window)
-        self.Vertical_layout_Table = QtWidgets.QVBoxLayout()
-        self.Vertical_layout_Table.setObjectName("Vertical_layout_1")
-        self.Vertical_layout_Table.addWidget(self.Interface_Table_Main)
+        self.table_verticalLayout = QtWidgets.QVBoxLayout()
+        self.table_verticalLayout.setObjectName("Vertical_layout_1")
+        self.table_verticalLayout.addWidget(self.Interface_TableMain)
 
-        self.Layout_Main = QtWidgets.QHBoxLayout(self.centralwidget)
-        self.Layout_Main.setObjectName("Layout_Main")
-        self.Layout_Main.addLayout(self.Vertical_layout_Table)
-        self.Layout_Main.addSpacing(260)
+        self.table_layoutMain = QtWidgets.QHBoxLayout(self.centralwidget)
+        self.table_layoutMain.setObjectName("table_layoutMain")
+        self.table_layoutMain.addLayout(self.table_verticalLayout)
+        self.table_layoutMain.addSpacing(260)
 
         # MenuBar
         self.menubar = QtWidgets.QMenuBar(MainWindow)
@@ -543,7 +543,7 @@ class GUI(Ui_MainWindow):
         self.Interface_Button_Reports.clicked.connect(self.f_calendar)
         self.Interface_Button_UpdateHistory.clicked.connect(self.f_updateBalanceHistory)
 
-        self.Interface_Table_Main.horizontalHeader().sectionClicked.connect(self.f_tableColumnSort)
+        self.Interface_TableMain.horizontalHeader().sectionClicked.connect(self.f_tableColumnSort)
 
         self.Interface_LineEdit_Ticker_Name.textChanged.connect(self.f_tickersAddRemove)
         self.Interface_LineEdit_Proxy.editingFinished.connect(self.f_hdfFileUpdate)
@@ -575,7 +575,7 @@ class GUI(Ui_MainWindow):
 
         self.sortTable = [logicalIndex, self.sorting[logicalIndex]]
 
-        self.Interface_Table_Main.sortItems(self.sortTable[0], self.sortTable[1])
+        self.Interface_TableMain.sortItems(self.sortTable[0], self.sortTable[1])
 
     def f_checkConnection(self):
         ''' Check if the internet connection can provide access to avanza.se '''
@@ -718,10 +718,10 @@ class GUI(Ui_MainWindow):
         self.f_fillTableTickers()
 
     def f_fillTableTickers(self):
-        self.Interface_Table_Main.clearContents()
+        self.Interface_TableMain.clearContents()
 
-        self.Interface_Table_Main.setColumnCount(9)
-        self.Interface_Table_Main.setRowCount(len(self.TICKERS))
+        self.Interface_TableMain.setColumnCount(9)
+        self.Interface_TableMain.setRowCount(len(self.TICKERS))
 
         offset = 20 if platform.system() == 'Windows' else 0
         self.MainWindow_size_height = max(421 + offset, 61 + offset + 20*len(self.TICKERS))
@@ -732,19 +732,19 @@ class GUI(Ui_MainWindow):
 
         for i, tickerNumber in enumerate(self.TICKERS):
 
-            self.Interface_Table_Main.setRowHeight(i, 1 if platform.system == "Windows" else 20)
+            self.Interface_TableMain.setRowHeight(i, 1 if platform.system == "Windows" else 20)
 
-            for j in range(0, self.Interface_Table_Main.columnCount()):
+            for j in range(0, self.Interface_TableMain.columnCount()):
                 item = QtWidgets.QTableWidgetItem()
                 item.setTextAlignment(QtCore.Qt.AlignCenter)
                 item.setText(column_names[j])
-                self.Interface_Table_Main.setColumnWidth(j, column_widths[j])
-                self.Interface_Table_Main.setHorizontalHeaderItem(j, item)
+                self.Interface_TableMain.setColumnWidth(j, column_widths[j])
+                self.Interface_TableMain.setHorizontalHeaderItem(j, item)
 
                 if j == 0:
-                    item = QtWidgets.QPushButton(self.Interface_Table_Main)
+                    item = QtWidgets.QPushButton(self.Interface_TableMain)
                     item.setText(str(tickerNumber))
-                    self.Interface_Table_Main.setCellWidget(i, j, item)
+                    self.Interface_TableMain.setCellWidget(i, j, item)
                 else:
                     item = QtWidgets.QTableWidgetItem()
                     item.setTextAlignment(QtCore.Qt.AlignCenter)
@@ -754,7 +754,7 @@ class GUI(Ui_MainWindow):
 
                     item.setFlags(QtCore.Qt.ItemIsEditable)
                     item.setData(QtCore.Qt.EditRole, content)
-                    self.Interface_Table_Main.setItem(i, j, item)
+                    self.Interface_TableMain.setItem(i, j, item)
 
         self.f_updateTableContent()
 
@@ -788,15 +788,15 @@ class GUI(Ui_MainWindow):
 
         # Fill the table
         for index, ticker in enumerate(self.all_data):
-            item = QtWidgets.QPushButton(self.Interface_Table_Main)
+            item = QtWidgets.QPushButton(self.Interface_TableMain)
             item.setText(str(ticker.number))
             item.clicked.connect(self.f_tickerDetailedInfo)
-            self.Interface_Table_Main.setCellWidget(index, 0, item)
-            self.Interface_Table_Main.item(index, 1).setText(str(ticker.name))
-            self.Interface_Table_Main.item(index, 2).setText(str(ticker.country))
-            self.Interface_Table_Main.item(index, 3).setData(QtCore.Qt.EditRole, ticker.price_updateTime)
-            self.Interface_Table_Main.item(index, 4).setData(QtCore.Qt.EditRole, ticker.peRatio)
-            self.Interface_Table_Main.item(index, 5).setData(QtCore.Qt.EditRole, ticker.changePercent)
+            self.Interface_TableMain.setCellWidget(index, 0, item)
+            self.Interface_TableMain.item(index, 1).setText(str(ticker.name))
+            self.Interface_TableMain.item(index, 2).setText(str(ticker.country))
+            self.Interface_TableMain.item(index, 3).setData(QtCore.Qt.EditRole, ticker.price_updateTime)
+            self.Interface_TableMain.item(index, 4).setData(QtCore.Qt.EditRole, ticker.peRatio)
+            self.Interface_TableMain.item(index, 5).setData(QtCore.Qt.EditRole, ticker.changePercent)
 
             if ticker.currency not in balance: balance[ticker.currency] = 0
             if ticker.currency + "/SEK" not in self.currencyRates and ticker.currency != "SEK":
@@ -809,13 +809,13 @@ class GUI(Ui_MainWindow):
                 total = round(ticker.price_last * ticker.count * (1 if ticker.currency == "SEK" else self.currencyRates[ticker.currency + "/SEK"][0]))
                 balance["SEK"] += int(total)
 
-            self.Interface_Table_Main.item(index, 6).setData(QtCore.Qt.EditRole, price_last)
-            self.Interface_Table_Main.item(index, 7).setData(QtCore.Qt.EditRole, ticker.count)
-            self.Interface_Table_Main.item(index, 8).setData(QtCore.Qt.EditRole, total)
+            self.Interface_TableMain.item(index, 6).setData(QtCore.Qt.EditRole, price_last)
+            self.Interface_TableMain.item(index, 7).setData(QtCore.Qt.EditRole, ticker.count)
+            self.Interface_TableMain.item(index, 8).setData(QtCore.Qt.EditRole, total)
 
             # Color of the text ("Change today") is defined by its content. Black for other columns
-            [self.Interface_Table_Main.item(index, i).setForeground(QtGui.QColor(0, 0, 0)) for i in range(1, 9)]
-            self.Interface_Table_Main.item(index, 5).setForeground(
+            [self.Interface_TableMain.item(index, i).setForeground(QtGui.QColor(0, 0, 0)) for i in range(1, 9)]
+            self.Interface_TableMain.item(index, 5).setForeground(
                 QtGui.QBrush(QtGui.QColor(255, 0, 0) if ticker.changePercent < 0 else QtGui.QColor(0, 0, 255)))
 
             # Prepare message for toast notification
@@ -834,7 +834,7 @@ class GUI(Ui_MainWindow):
         self.Interface_Label_Balance.setText("Balance: " + str(self.totalBalance))
 
         # Sort the table for consistent view
-        self.Interface_Table_Main.sortItems(self.sortTable[0], self.sortTable[1])
+        self.Interface_TableMain.sortItems(self.sortTable[0], self.sortTable[1])
 
         # Warning
         self.f_showWarnings("Significant drop today (by more than " + self.Interface_LineEdit_ShowWarnings.text() + "%)", self.message)
