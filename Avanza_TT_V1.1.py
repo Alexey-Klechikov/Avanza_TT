@@ -916,6 +916,7 @@ class GUI(Ui_MainWindow):
         missingTickers = list(pd.concat([df_datesFull["Ticker"].drop_duplicates(), df_pricesHistory["Ticker"].drop_duplicates()]).drop_duplicates(keep=False))
         for ticker in missingTickers:
             tickerData = Ticker(int(ticker), 1, proxies=self.proxies)
+            tickerData.chartdata["Date"] = pd.to_datetime(tickerData.chartdata["Date"])
             df_temp = tickerData.chartdata[tickerData.chartdata["Date"] >= df_datesWithData['Date'][0]]
             df_temp["Ticker"] = tickerData.number
             df_pricesHistory = pd.concat([df_pricesHistory, df_temp])
